@@ -1,0 +1,78 @@
+{% block title %}
+{% endblock title %}
+
+{% block content %}
+   <h1>Все объявления</h1>
+
+    <form action="" method="get">
+    {{ filterset.form.as_p }}
+
+    <input type="submit" value="Найти"/>
+    </form>
+   {% if posts %}
+       <table>
+           <tr>
+               <td>Название</td>
+               <td>Объявление</td>
+               <td>Дата создания</td>
+               <td>Автор</td>
+               <td>Категория</td>
+               <td>Изображения</td>
+               <td>Комметарий</td>
+               <td>Автор комментария</td>
+
+           </tr>
+
+           {% for p in posts %}
+           <tr>
+               <td>
+                   <a href="{% url 'post_detail' p.id  %}">{{ p.title }}</a>
+               </td>
+               <td>{{ p.content|truncatechars:300 }}</td>
+               <td>{{ p.post_created_at }}</td>
+               <td>{{ p.author }}</td>
+               <td>{{ p.type }}</td>
+               <td>{{ p.image }}</td>
+               <td>{% for c in p.PostComment.all %}
+                   {{ c.content|truncatechars:150 }}
+                   {% endfor %}
+               </td>
+               <td>{% for c in p.PostComment.all %}
+                   {{ c.author }}
+                   {% endfor %}
+               </td>
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+
+       <h2>Сообщений нет!</h2>
+   {% endif %}
+
+<button> <a href="{% url 'post_create' %}"> Создать объявление </a> </button>
+<button> <a href="{% url 'comment_create' %}"> Создать отклик </a> </button>
+
+      {% csrf_token %}
+      <button type="submit">Выйти</button>
+</form>
+
+   {% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
+{% endblock content %}
